@@ -24,9 +24,10 @@ import org.apache.spark.sql.{SparkSessionExtensions, SparkSessionExtensionsProvi
 class SparkUdfExtension extends SparkSessionExtensionsProvider {
   override def apply(v1: SparkSessionExtensions): Unit = {
     v1.injectFunction(
-        (new FunctionIdentifier("run_script_map_str"),
-          new ExpressionInfo(classOf[RunScriptMapStrExpression].getName,
-            "run_script_map_str"),  (children: Seq[Expression]) => new RunScriptMapStrExpression((children.head)))
+        (new FunctionIdentifier("run_script_map_in_str_out_str"),
+          new ExpressionInfo(classOf[RunScriptMapInStrOutStr].getName,
+            "run_script_map_in_str_out_str"),  RunScriptMapInStrOutStr.apply)
     )
   }
 }
+
