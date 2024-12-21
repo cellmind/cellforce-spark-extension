@@ -1,5 +1,6 @@
 package cellgen.spark
 
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.spark.sql.SparkSessionExtensions
 import org.apache.spark.sql.catalyst.expressions.codegen.Block.BlockHelper
 import org.apache.spark.sql.catalyst.expressions.{ExpectsInputTypes, Expression, ExpressionInfo, UnaryExpression}
@@ -8,11 +9,15 @@ import org.apache.spark.sql.catalyst.trees.UnaryLike
 import org.apache.spark.sql.types.{AbstractDataType, DataType, StringType}
 import org.apache.spark.unsafe.types.UTF8String
 
+import scala.collection.mutable
+
 
 case class RunScriptMapInStrOutStr(lang: Expression,
                                    script: Expression,
                                    func: Expression,
                                    column: Expression) extends  Expression with ExpectsInputTypes {
+
+  private val nativeFunctionRunnerPointers = new mutable.HashMap[String, Long]()
 
   override def children: Seq[Expression] = Seq(lang, script, func, column)
 
@@ -21,17 +26,33 @@ case class RunScriptMapInStrOutStr(lang: Expression,
   override def nullable: Boolean = true
 
   override def eval(input: org.apache.spark.sql.catalyst.InternalRow): Any = {
-    val langValue = lang.eval(input).asInstanceOf[UTF8String]
+    var langValue = lang.eval(input).asInstanceOf[UTF8String]
     val scriptValue = script.eval(input).asInstanceOf[UTF8String]
-    val funcValue = func.eval(input).asInstanceOf[UTF8String]
+    var funcValue = func.eval(input).asInstanceOf[UTF8String]
     val columnValue = column.eval(input).asInstanceOf[UTF8String]
 
     if (langValue == null || scriptValue == null ||
       funcValue == null || columnValue == null) {
       return null
     }
+
+    langValue = langValue.trim()
+    funcValue = funcValue.trim()
+
+    val langKey = DigestUtils.md5Hex(langValue.toString)
+    val scriptKey = DigestUtils.md5Hex(scriptValue.toString)
+    val funcKey = DigestUtils.md5Hex(funcValue.toString)
+    val runnerKey = s"${langKey}:${scriptKey}:${funcKey}"
+
     val native = new NativeFunctions()
-    val scriptRunnerPointer = native.newScriptRunner(langValue.toString, scriptValue.toString, funcValue.toString);
+    val scriptRunnerPointer: Long =
+      if (nativeFunctionRunnerPointers.contains(runnerKey)) {
+        println(s"got from pool: ${runnerKey}")
+        nativeFunctionRunnerPointers(runnerKey)
+      } else {
+        println("new runner: ")
+        native.newScriptRunner(langValue.toString, scriptValue.toString, funcValue.toString)
+      }
     val result = native.runScriptMapInStrOutStr(scriptRunnerPointer, columnValue.toString)
     val utf8String = UTF8String.fromString(result)
     utf8String
