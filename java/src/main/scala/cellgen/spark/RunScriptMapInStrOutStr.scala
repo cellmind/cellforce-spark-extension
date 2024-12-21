@@ -32,7 +32,7 @@ case class RunScriptMapInStrOutStr(lang: Expression,
     }
     val native = new NativeFunctions()
     val scriptRunnerPointer = native.newScriptRunner(langValue.toString, scriptValue.toString, funcValue.toString);
-    val result = native.runScriptMapInStrOutStr(scriptRunnerPointer, column.toString())
+    val result = native.runScriptMapInStrOutStr(scriptRunnerPointer, columnValue.toString)
     val utf8String = UTF8String.fromString(result)
     utf8String
   }
