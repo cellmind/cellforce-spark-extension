@@ -31,6 +31,12 @@ class SparkUdfExtension extends SparkSessionExtensionsProvider {
     )
 
     extensions.injectFunction(
+      (new FunctionIdentifier("run_script_map_in_str_out_bool"),
+        new ExpressionInfo(classOf[RunScriptMapInStrOutBool].getName,
+          "run_script_map_in_str_out_bool"),  RunScriptMapInStrOutBool.apply)
+    )
+
+    extensions.injectFunction(
       (new FunctionIdentifier("run_script_reduce_in_int_out_int"),
         new ExpressionInfo(
           classOf[RunScriptReduceInIntOutInt].getCanonicalName,
