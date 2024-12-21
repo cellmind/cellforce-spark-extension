@@ -33,12 +33,14 @@ unsafe fn drop_pointer_in_place<T>(ptr: *mut T) {
 }
 
 #[call_from_java("cellgen.spark.NativeFunctions.newscriptrunner")]
-fn new_script_runner(lang: Instance) -> Result<Instance, String> {
+fn new_script_runner(lang: Instance, script: Instance, func: Instance) -> Result<Instance, String> {
     let jvm: Jvm = Jvm::attach_thread().unwrap();
     let lang: String = jvm.to_rust(lang).unwrap();
+    let script: String = jvm.to_rust(script).unwrap();
+    let func: String = jvm.to_rust(func).unwrap();
 
     let builder = ScriptFunctionRunnerBuilder::new();
-    let runner = builder.build("", "", "").unwrap();
+    let runner = builder.build(lang.as_str(), script.as_str(), func.as_str()).unwrap();
     let runner = Box::new(runner);
     let runner: *mut Arc<dyn ScriptFunctionRunner> = Box::into_raw(runner);
     let pointer: i64 = runner as jlong;
@@ -57,14 +59,14 @@ fn drop_script_runner(pointer: Instance) -> Result<Instance, String> {
     Instance::try_from(ia).map_err(|error| format!("{}", error))
 }
 
-#[call_from_java("cellgen.spark.NativeFunctions.runscriptmapstr")]
-fn run_script_map_str(pointer: Instance, value: Instance) -> Result<Instance, String> {
+#[call_from_java("cellgen.spark.NativeFunctions.runscriptmapinstroutstr")]
+fn run_script_map_in_str_out_str(pointer: Instance, value: Instance) -> Result<Instance, String> {
     let jvm: Jvm = Jvm::attach_thread().unwrap();
     let pointer: i64 = jvm.to_rust(pointer).unwrap();
     let pointer: jlong = pointer;
     let runner: &Arc<dyn ScriptFunctionRunner> = unsafe { jlong_to_pointer::<Arc<dyn ScriptFunctionRunner>>(pointer).as_mut().unwrap() };
     let value: String = jvm.to_rust(value).unwrap();
-    let result: String = runner.str2str(value.as_str()).unwrap();
+    let result: String = runner.map_in_str_out_str(value.as_str()).unwrap();
     let ia = InvocationArg::try_from(result).map_err(|error| format!("{}", error)).unwrap();
     Instance::try_from(ia).map_err(|error| format!("{}", error))
 }

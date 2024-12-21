@@ -16,10 +16,10 @@ package cellgen.spark;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Welcome. This is a simple example that demonstrates calls to rust functions using j4rs.\n");
         var nativeFunctions = new NativeFunctions();
-        var scriptRunnerPointer = nativeFunctions.newScriptRunner("rhai");
-        var result = nativeFunctions.runScriptMapStr(scriptRunnerPointer, "hello");
+        var scriptRunnerPointer = nativeFunctions.newScriptRunner("rhai", "fn double_str(s) { s + s } ", "double_str");
+        var result = nativeFunctions.runScriptMapInStrOutStr(scriptRunnerPointer, "hello");
+        System.out.println("output str: " + result);
         nativeFunctions.dropScriptRunner(scriptRunnerPointer);
         System.out.println(result);
     }

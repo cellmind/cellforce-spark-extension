@@ -24,10 +24,9 @@ case class RunScriptMapStrExpression(child: Expression) extends  UnaryExpression
     val value = child.eval(input)
     if (value == null) null
     else {
-      val value2 = s"echo-prefix: $value"
       val native = new NativeFunctions()
-      val scriptRunnerPointer = native.newScriptRunner("rhai")
-      val result = native.runScriptMapStr(scriptRunnerPointer, value2);
+      val scriptRunnerPointer = native.newScriptRunner("rhai", "fn double_str(s) { s + s } ", "double_str");
+      val result = native.runScriptMapInStrOutStr(scriptRunnerPointer, value.toString);
       val utf8String = UTF8String.fromString(result)
       utf8String
     }
