@@ -18,7 +18,7 @@
 package cellgen.spark
 
 import org.apache.spark.sql.catalyst.FunctionIdentifier
-import org.apache.spark.sql.catalyst.expressions.aggregate.UserSum
+import org.apache.spark.sql.catalyst.expressions.aggregate.{RunScriptReduceInIntOutInt, UserSum}
 import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionInfo}
 import org.apache.spark.sql.{SparkSessionExtensions, SparkSessionExtensionsProvider}
 
@@ -28,6 +28,15 @@ class SparkUdfExtension extends SparkSessionExtensionsProvider {
         (new FunctionIdentifier("run_script_map_in_str_out_str"),
           new ExpressionInfo(classOf[RunScriptMapInStrOutStr].getName,
             "run_script_map_in_str_out_str"),  RunScriptMapInStrOutStr.apply)
+    )
+
+    extensions.injectFunction(
+      (new FunctionIdentifier("run_script_reduce_in_int_out_int"),
+        new ExpressionInfo(
+          classOf[RunScriptReduceInIntOutInt].getCanonicalName,
+          "run_script_reduce_in_int_out_int"
+        ),
+        RunScriptReduceInIntOutInt.apply)
     )
 
     extensions.injectFunction(

@@ -72,3 +72,16 @@ fn run_script_map_in_str_out_str(pointer: Instance, value: Instance) -> Result<I
 }
 
 
+#[call_from_java("cellgen.spark.NativeFunctions.runscriptmapinstroutbool")]
+fn run_script_map_in_str_out_bool(pointer: Instance, value: Instance) -> Result<Instance, String> {
+    let jvm: Jvm = Jvm::attach_thread().unwrap();
+    let pointer: i64 = jvm.to_rust(pointer).unwrap();
+    let pointer: jlong = pointer;
+    let runner: &Arc<dyn ScriptFunctionRunner> = unsafe { jlong_to_pointer::<Arc<dyn ScriptFunctionRunner>>(pointer).as_mut().unwrap() };
+    let value: String = jvm.to_rust(value).unwrap();
+    let result: bool = runner.map_in_str_out_bool(value.as_str()).unwrap();
+    let ia = InvocationArg::try_from(result).map_err(|error| format!("{}", error)).unwrap();
+    Instance::try_from(ia).map_err(|error| format!("{}", error))
+}
+
+

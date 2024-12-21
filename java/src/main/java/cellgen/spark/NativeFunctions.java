@@ -22,6 +22,7 @@ public class NativeFunctions {
     private static native Instance newscriptrunner(Instance<String> lang, Instance<String> script, Instance<String> func);
     private static native Instance dropscriptrunner(Instance<Long> pointer);
     private static native Instance runscriptmapinstroutstr(Instance<Long> pointer, Instance<String> value);
+    private static native Instance runscriptmapinstroutbool(Instance<Long> pointer, Instance<String> value);
 
 
     static {
@@ -46,5 +47,10 @@ public class NativeFunctions {
         return result;
     }
 
+    public Boolean runScriptMapInStrOutBool(Long pointer, String value) {
+        Instance instance = runscriptmapinstroutbool(Java2RustUtils.createInstance(pointer), Java2RustUtils.createInstance(value));
+        Boolean result = Java2RustUtils.getObjectCasted(instance);
+        return result;
+    }
 }
 
