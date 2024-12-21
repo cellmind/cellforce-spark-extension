@@ -51,7 +51,9 @@ case class RunScriptMapInStrOutStr(lang: Expression,
         nativeFunctionRunnerPointers(runnerKey)
       } else {
         println("new runner: ")
-        native.newScriptRunner(langValue.toString, scriptValue.toString, funcValue.toString)
+        val pointer = native.newScriptRunner(langValue.toString, scriptValue.toString, funcValue.toString)
+        nativeFunctionRunnerPointers.put(runnerKey, pointer)
+        pointer
       }
     val result = native.runScriptMapInStrOutStr(scriptRunnerPointer, columnValue.toString)
     val utf8String = UTF8String.fromString(result)
