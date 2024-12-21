@@ -61,6 +61,7 @@ fn drop_script_runner(pointer: Instance) -> Result<Instance, String> {
 
 #[call_from_java("cellgen.spark.NativeFunctions.runscriptmapinstroutstr")]
 fn run_script_map_in_str_out_str(pointer: Instance, value: Instance) -> Result<Instance, String> {
+    println!("call java ------------------- out str ");
     let jvm: Jvm = Jvm::attach_thread().unwrap();
     let pointer: i64 = jvm.to_rust(pointer).unwrap();
     let pointer: jlong = pointer;
@@ -74,6 +75,7 @@ fn run_script_map_in_str_out_str(pointer: Instance, value: Instance) -> Result<I
 
 #[call_from_java("cellgen.spark.NativeFunctions.runscriptmapinstroutbool")]
 fn run_script_map_in_str_out_bool(pointer: Instance, value: Instance) -> Result<Instance, String> {
+    println!("call java ------------------- out bool ");
     let jvm: Jvm = Jvm::attach_thread().unwrap();
     let pointer: i64 = jvm.to_rust(pointer).unwrap();
     let pointer: jlong = pointer;
