@@ -18,15 +18,25 @@
 package cellgen.spark
 
 import org.apache.spark.sql.catalyst.FunctionIdentifier
+import org.apache.spark.sql.catalyst.expressions.aggregate.UserSum
 import org.apache.spark.sql.catalyst.expressions.{Expression, ExpressionInfo}
 import org.apache.spark.sql.{SparkSessionExtensions, SparkSessionExtensionsProvider}
 
 class SparkUdfExtension extends SparkSessionExtensionsProvider {
-  override def apply(v1: SparkSessionExtensions): Unit = {
-    v1.injectFunction(
+  override def apply(extensions: SparkSessionExtensions): Unit = {
+    extensions.injectFunction(
         (new FunctionIdentifier("run_script_map_in_str_out_str"),
           new ExpressionInfo(classOf[RunScriptMapInStrOutStr].getName,
             "run_script_map_in_str_out_str"),  RunScriptMapInStrOutStr.apply)
+    )
+
+    extensions.injectFunction(
+      (new FunctionIdentifier("user_sum"),
+      new ExpressionInfo(
+        classOf[UserSum].getCanonicalName,
+        "user_sum"
+      ),
+        UserSum.apply)
     )
   }
 }
