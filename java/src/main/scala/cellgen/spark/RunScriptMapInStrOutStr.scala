@@ -60,7 +60,7 @@ case class RunScriptMapInStrOutStr(lang: Expression,
     RunScriptMapInStrOutStr(newChildren(0), newChildren(1), newChildren(2), newChildren(3))
   }
 
-  override def inputTypes: Seq[DataType] = Seq(StringType, StringType, StringType)
+  override def inputTypes: Seq[DataType] = Seq(StringType, StringType, StringType, StringType)
 }
 
 
