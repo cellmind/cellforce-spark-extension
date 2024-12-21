@@ -85,7 +85,7 @@ case class RunScriptMapInStrOutBool(lang: Expression,
 
 object RunScriptMapInStrOutBool {
   def apply(children: Seq[Expression]): Expression = {
-    new RunScriptMapInStrOutStr(
+    new RunScriptMapInStrOutBool(
       children.head,
       children.apply(1),
       children.apply(2),
