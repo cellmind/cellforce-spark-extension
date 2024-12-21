@@ -76,7 +76,7 @@ case class RunScriptMapInStrOutBool(lang: Expression,
 //  override def inputTypes: Seq[AbstractDataType] = Seq(StringType, StringType, StringType)
 
   override protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
-    RunScriptMapInStrOutStr(newChildren(0), newChildren(1), newChildren(2), newChildren(3))
+    RunScriptMapInStrOutBool(newChildren(0), newChildren(1), newChildren(2), newChildren(3))
   }
 
   override def inputTypes: Seq[DataType] = Seq(StringType, StringType, StringType, StringType)
