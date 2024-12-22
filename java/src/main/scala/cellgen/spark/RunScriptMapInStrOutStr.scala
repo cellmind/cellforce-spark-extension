@@ -105,7 +105,14 @@ case class RunScriptMapInStrOutStr(lang: Expression,
 
     val native = ctx.freshName("native")
     val runnerKey = ctx.freshName("runnerKey")
+    val pointer = ctx.freshName("pointer")
     val resultTerm = ctx.freshName("result")
+
+    // 添加临时变量来存储转换后的String值
+    val langStrTerm = ctx.freshName("langStr")
+    val scriptStrTerm = ctx.freshName("scriptStr")
+    val funcStrTerm = ctx.freshName("funcStr")
+    val columnStrTerm = ctx.freshName("columnStr")
 
     ev.copy(code =
       code"""
@@ -120,29 +127,38 @@ case class RunScriptMapInStrOutStr(lang: Expression,
             !${funcGen.isNull} && !${columnGen.isNull}) {
 
           try {
-            String trimmedLang = ${langGen.value}.trim();
-            String trimmedFunc = ${funcGen.value}.trim();
+            // 先将UTF8String转换为Java String
+            String $langStrTerm = ${langGen.value}.toString();
+            String $scriptStrTerm = ${scriptGen.value}.toString();
+            String $funcStrTerm = ${funcGen.value}.toString();
+            String $columnStrTerm = ${columnGen.value}.toString();
+
+            // 进行trim操作
+            $langStrTerm = $langStrTerm.trim();
+            $funcStrTerm = $funcStrTerm.trim();
 
             String $runnerKey = $computeKeyFuncName(
-              trimmedLang,
-              ${scriptGen.value}.toString(),
-              trimmedFunc
+              $langStrTerm,
+              $scriptStrTerm,
+              $funcStrTerm
             );
 
             $nativeClass $native = new $nativeClass();
 
-            long pointer = $runnerMapTerm.computeIfAbsent(
-              $runnerKey,
-              k -> $native.newScriptRunner(
-                trimmedLang,
-                ${scriptGen.value}.toString(),
-                trimmedFunc
-              )
-            );
+            // 替换lambda表达式
+            long $pointer = $runnerMapTerm.get($runnerKey);
+            if ($pointer == 0L) {
+              $pointer = $native.newScriptRunner(
+                $langStrTerm,
+                $scriptStrTerm,
+                $funcStrTerm
+              );
+              $runnerMapTerm.put($runnerKey, $pointer);
+            }
 
             String $resultTerm = $native.runScriptMapInStrOutStr(
-              pointer,
-              ${columnGen.value}.toString()
+              $pointer,
+              $columnStrTerm
             );
 
             if ($resultTerm != null) {
@@ -155,6 +171,9 @@ case class RunScriptMapInStrOutStr(lang: Expression,
         }
       """)
   }
+
+
+
 
   override def prettyName: String = "run_script_map_in_str_out_str"
 
