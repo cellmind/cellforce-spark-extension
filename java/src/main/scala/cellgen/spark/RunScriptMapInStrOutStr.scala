@@ -47,10 +47,8 @@ case class RunScriptMapInStrOutStr(lang: Expression,
     val native = new NativeFunctions()
     val scriptRunnerPointer: Long =
       if (nativeFunctionRunnerPointers.contains(runnerKey)) {
-        println(s"got from pool: ${runnerKey}")
         nativeFunctionRunnerPointers(runnerKey)
       } else {
-        println("new runner: ")
         val pointer = native.newScriptRunner(langValue.toString, scriptValue.toString, funcValue.toString)
         nativeFunctionRunnerPointers.put(runnerKey, pointer)
         pointer

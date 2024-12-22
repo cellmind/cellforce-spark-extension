@@ -42,14 +42,12 @@ public class NativeFunctions {
     }
 
     public String runScriptMapInStrOutStr(Long pointer, String value) {
-        System.out.println("in java, run out str");
         Instance instance = runscriptmapinstroutstr(Java2RustUtils.createInstance(pointer), Java2RustUtils.createInstance(value));
         String result = Java2RustUtils.getObjectCasted(instance);
         return result;
     }
 
     public Boolean runScriptMapInStrOutBool(Long pointer, String value) {
-        System.out.println("in java, run out bool");
         Instance instance = runscriptmapinstroutbool(Java2RustUtils.createInstance(pointer), Java2RustUtils.createInstance(value));
         Boolean result = Java2RustUtils.getObjectCasted(instance);
         return result;
