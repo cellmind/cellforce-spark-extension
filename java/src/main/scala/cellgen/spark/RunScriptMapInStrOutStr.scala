@@ -6,7 +6,7 @@ import org.apache.spark.sql.catalyst.expressions.codegen.Block.BlockHelper
 import org.apache.spark.sql.catalyst.expressions.{ExpectsInputTypes, Expression, ExpressionInfo, UnaryExpression}
 import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode, JavaCode}
 import org.apache.spark.sql.catalyst.trees.UnaryLike
-import org.apache.spark.sql.types.{AbstractDataType, BooleanType, DataType, StringType}
+import org.apache.spark.sql.types.{AbstractDataType, DataType, StringType}
 import org.apache.spark.unsafe.types.UTF8String
 
 import java.util.concurrent.ConcurrentHashMap
@@ -18,17 +18,23 @@ case class RunScriptMapInStrOutStr(lang: Expression,
                                    func: Expression,
                                    column: Expression) extends  Expression with ExpectsInputTypes {
 
+
   @transient private lazy val nativeFunctionRunnerPointers =
     new ConcurrentHashMap[String, Long]()
 
+
   override def children: Seq[Expression] = Seq(lang, script, func, column)
-
   override def dataType: DataType = StringType
-
   override def nullable: Boolean = true
 
-  override def eval(input: org.apache.spark.sql.catalyst.InternalRow): Any = {
+  private def computeRunnerKey(lang: String, script: String, func: String): String = {
+    val langKey = DigestUtils.md5Hex(lang)
+    val scriptKey = DigestUtils.md5Hex(script)
+    val funcKey = DigestUtils.md5Hex(func)
+    s"$langKey:$scriptKey:$funcKey"
+  }
 
+  override def eval(input: org.apache.spark.sql.catalyst.InternalRow): Any = {
     val langValue = lang.eval(input).asInstanceOf[UTF8String]
     val scriptValue = script.eval(input).asInstanceOf[UTF8String]
     val funcValue = func.eval(input).asInstanceOf[UTF8String]
@@ -39,39 +45,39 @@ case class RunScriptMapInStrOutStr(lang: Expression,
       return null
     }
 
-    // Compute keys once
-    val runnerKey = computeRunnerKey(
-      langValue.trim().toString,
-      scriptValue.toString,
-      funcValue.trim().toString
-    )
-
     try {
+      val trimmedLang = langValue.trim()
+      val trimmedFunc = funcValue.trim()
+
+      val runnerKey = computeRunnerKey(
+        trimmedLang.toString,
+        scriptValue.toString,
+        trimmedFunc.toString
+      )
+
       val native = new NativeFunctions()
       val scriptRunnerPointer = nativeFunctionRunnerPointers.computeIfAbsent(
         runnerKey,
-        key => native.newScriptRunner(
-          langValue.trim().toString,
+        _ => native.newScriptRunner(
+          trimmedLang.toString,
           scriptValue.toString,
-          funcValue.trim().toString
+          trimmedFunc.toString
         )
       )
 
-      native.runScriptMapInStrOutStr(scriptRunnerPointer, columnValue.toString)
+      val result = native.runScriptMapInStrOutStr(
+        scriptRunnerPointer,
+        columnValue.toString
+      )
+
+      if (result == null) null
+      else UTF8String.fromString(result)
     } catch {
       case e: Exception =>
         // Log error
         null
     }
   }
-
-  private def computeRunnerKey(lang: String, script: String, func: String): String = {
-    val langKey = DigestUtils.md5Hex(lang)
-    val scriptKey = DigestUtils.md5Hex(script)
-    val funcKey = DigestUtils.md5Hex(func)
-    s"$langKey:$scriptKey:$funcKey"
-  }
-
 
   override protected def doGenCode(ctx: CodegenContext, ev: ExprCode): ExprCode = {
     val langGen = lang.genCode(ctx)
@@ -99,6 +105,7 @@ case class RunScriptMapInStrOutStr(lang: Expression,
 
     val native = ctx.freshName("native")
     val runnerKey = ctx.freshName("runnerKey")
+    val resultTerm = ctx.freshName("result")
 
     ev.copy(code =
       code"""
@@ -107,41 +114,47 @@ case class RunScriptMapInStrOutStr(lang: Expression,
         ${funcGen.code}
         ${columnGen.code}
         boolean ${ev.isNull} = true;
-        String ${ev.value} = "";
+        UTF8String ${ev.value} = null;
 
         if (!${langGen.isNull} && !${scriptGen.isNull} &&
             !${funcGen.isNull} && !${columnGen.isNull}) {
 
-          String $runnerKey = $computeKeyFuncName(
-            ${langGen.value}.trim(),
-            ${scriptGen.value}.toString(),
-            ${funcGen.value}.trim()
-          );
-
-          $nativeClass $native = new $nativeClass();
-
           try {
+            String trimmedLang = ${langGen.value}.trim();
+            String trimmedFunc = ${funcGen.value}.trim();
+
+            String $runnerKey = $computeKeyFuncName(
+              trimmedLang,
+              ${scriptGen.value}.toString(),
+              trimmedFunc
+            );
+
+            $nativeClass $native = new $nativeClass();
+
             long pointer = $runnerMapTerm.computeIfAbsent(
               $runnerKey,
               k -> $native.newScriptRunner(
-                ${langGen.value}.trim().toString(),
+                trimmedLang,
                 ${scriptGen.value}.toString(),
-                ${funcGen.value}.trim().toString()
+                trimmedFunc
               )
             );
 
-            ${ev.value} = $native.runScriptMapInStrOutStr(
+            String $resultTerm = $native.runScriptMapInStrOutStr(
               pointer,
               ${columnGen.value}.toString()
             );
-            ${ev.isNull} = false;
+
+            if ($resultTerm != null) {
+              ${ev.value} = UTF8String.fromString($resultTerm);
+              ${ev.isNull} = false;
+            }
           } catch (Exception e) {
             ${ev.isNull} = true;
           }
         }
       """)
   }
-
 
   override def prettyName: String = "run_script_map_in_str_out_str"
 
