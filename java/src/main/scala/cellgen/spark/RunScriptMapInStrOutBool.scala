@@ -98,6 +98,7 @@ case class RunScriptMapInStrOutBool(lang: Expression,
     val native = ctx.freshName("native")
     val runnerKey = ctx.freshName("runnerKey")
     val pointer = ctx.freshName("pointer")
+    val existingPointer = ctx.freshName("existingPointer")
 
     // 添加临时变量来存储转换后的String值
     val langStrTerm = ctx.freshName("langStr")
@@ -136,15 +137,17 @@ case class RunScriptMapInStrOutBool(lang: Expression,
 
             $nativeClass $native = new $nativeClass();
 
-            // 替换lambda表达式
-            long $pointer = $runnerMapTerm.get($runnerKey);
-            if ($pointer == 0L) {
+            Long $existingPointer = (Long)$runnerMapTerm.get($runnerKey);
+            long $pointer = 0L;
+            if ($existingPointer == null) {
               $pointer = $native.newScriptRunner(
                 $langStrTerm,
                 $scriptStrTerm,
                 $funcStrTerm
               );
               $runnerMapTerm.put($runnerKey, $pointer);
+            } else {
+              $pointer = $existingPointer.longValue();
             }
 
             ${ev.value} = $native.runScriptMapInStrOutBool(
