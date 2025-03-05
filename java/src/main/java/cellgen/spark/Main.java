@@ -14,13 +14,22 @@
  */
 package cellgen.spark;
 
+
 public class Main {
     public static void main(String[] args) {
         var nativeFunctions = new NativeFunctions();
-        var scriptRunnerPointer = nativeFunctions.newScriptRunner("rhai", "fn double_str(s) { s + s } ", "double_str");
-        var result = nativeFunctions.scriptMapInStrOutStr(scriptRunnerPointer, "hello");
-        System.out.println("output str: " + result);
-        nativeFunctions.dropScriptRunner(scriptRunnerPointer);
-        System.out.println(result);
+        var rhaiScriptRunnerPointer = nativeFunctions.newScriptRunner("rhai", "fn double_str(s) { s + s } ", "double_str");
+        var rhaiResult = nativeFunctions.scriptMapInStrOutStr(rhaiScriptRunnerPointer, "hello");
+        System.out.println("output str: " + rhaiResult);
+        nativeFunctions.dropScriptRunner(rhaiScriptRunnerPointer);
+        System.out.println(rhaiResult);
+
+
+        var goScriptRunnerPointer = nativeFunctions.newScriptRunner("go", "func double_str(s string) string { return s + s; } ", "double_str");
+        var goResult = nativeFunctions.scriptMapInStrOutStr(goScriptRunnerPointer, "hello");
+        System.out.println("output str: " + goResult);
+        nativeFunctions.dropScriptRunner(goScriptRunnerPointer);
+        System.out.println(goResult);
+
     }
 }

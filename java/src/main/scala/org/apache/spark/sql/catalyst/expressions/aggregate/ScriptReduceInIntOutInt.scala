@@ -17,7 +17,7 @@ case class ScriptReduceInIntOutInt(
     with UnaryLike[Expression]
     with SupportQueryContext {
 
-  def this(child: Expression) = ScriptReduceInIntOutInt(child, EvalMode.fromSQLConf(SQLConf.get))
+  def this(child: Expression) = this(child, EvalMode.fromSQLConf(SQLConf.get))
 
   private def shouldTrackIsEmpty: Boolean = resultType match {
     case _: DecimalType => true
