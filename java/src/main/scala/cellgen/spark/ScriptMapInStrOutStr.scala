@@ -13,10 +13,10 @@ import java.util.concurrent.ConcurrentHashMap
 import scala.collection.mutable
 
 
-case class RunScriptMapInStrOutStr(lang: Expression,
-                                   script: Expression,
-                                   func: Expression,
-                                   column: Expression) extends  Expression with ExpectsInputTypes {
+case class ScriptMapInStrOutStr(lang: Expression,
+                                script: Expression,
+                                func: Expression,
+                                column: Expression) extends  Expression with ExpectsInputTypes {
 
 
   @transient private lazy val nativeFunctionRunnerPointers =
@@ -65,7 +65,7 @@ case class RunScriptMapInStrOutStr(lang: Expression,
         )
       )
 
-      val result = native.runScriptMapInStrOutStr(
+      val result = native.scriptMapInStrOutStr(
         scriptRunnerPointer,
         columnValue.toString
       )
@@ -160,7 +160,7 @@ case class RunScriptMapInStrOutStr(lang: Expression,
               $pointer = $existingPointer.longValue();
             }
 
-            String $resultTerm = $native.runScriptMapInStrOutStr(
+            String $resultTerm = $native.scriptMapInStrOutStr(
               $pointer,
               $columnStrTerm
             );
@@ -179,21 +179,21 @@ case class RunScriptMapInStrOutStr(lang: Expression,
 
 
 
-  override def prettyName: String = "run_script_map_in_str_out_str"
+  override def prettyName: String = "script_map_in_str_out_str"
 
 //  override def inputTypes: Seq[AbstractDataType] = Seq(StringType, StringType, StringType)
 
   override protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
-    RunScriptMapInStrOutStr(newChildren(0), newChildren(1), newChildren(2), newChildren(3))
+    ScriptMapInStrOutStr(newChildren(0), newChildren(1), newChildren(2), newChildren(3))
   }
 
   override def inputTypes: Seq[DataType] = Seq(StringType, StringType, StringType, StringType)
 }
 
 
-object RunScriptMapInStrOutStr {
+object ScriptMapInStrOutStr {
   def apply(children: Seq[Expression]): Expression = {
-    new RunScriptMapInStrOutStr(
+    new ScriptMapInStrOutStr(
       children.head,
       children.apply(1),
       children.apply(2),

@@ -18,7 +18,7 @@ public class Main {
     public static void main(String[] args) {
         var nativeFunctions = new NativeFunctions();
         var scriptRunnerPointer = nativeFunctions.newScriptRunner("rhai", "fn double_str(s) { s + s } ", "double_str");
-        var result = nativeFunctions.runScriptMapInStrOutStr(scriptRunnerPointer, "hello");
+        var result = nativeFunctions.scriptMapInStrOutStr(scriptRunnerPointer, "hello");
         System.out.println("output str: " + result);
         nativeFunctions.dropScriptRunner(scriptRunnerPointer);
         System.out.println(result);

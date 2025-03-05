@@ -9,7 +9,7 @@ import org.apache.spark.sql.catalyst.util.TypeUtils
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
 
-case class RunScriptReduceInIntOutInt(
+case class ScriptReduceInIntOutInt(
                 child: Expression,
                 evalMode: EvalMode.Value = EvalMode.fromSQLConf(SQLConf.get))
   extends DeclarativeAggregate
@@ -17,7 +17,7 @@ case class RunScriptReduceInIntOutInt(
     with UnaryLike[Expression]
     with SupportQueryContext {
 
-  def this(child: Expression) = this(child, EvalMode.fromSQLConf(SQLConf.get))
+  def this(child: Expression) = ScriptReduceInIntOutInt(child, EvalMode.fromSQLConf(SQLConf.get))
 
   private def shouldTrackIsEmpty: Boolean = resultType match {
     case _: DecimalType => true
@@ -166,9 +166,9 @@ case class RunScriptReduceInIntOutInt(
 }
 
 
-object RunScriptReduceInIntOutInt {
+object ScriptReduceInIntOutInt {
   def apply(children: Seq[Expression]): Expression = {
-    new RunScriptReduceInIntOutInt(
+    new ScriptReduceInIntOutInt(
       children.head,
     )
   }

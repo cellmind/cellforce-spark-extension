@@ -11,10 +11,10 @@ import java.util.concurrent.ConcurrentHashMap
 import scala.collection.mutable
 
 
-case class RunScriptMapInStrOutBool(lang: Expression,
-                                   script: Expression,
-                                   func: Expression,
-                                   column: Expression) extends  Expression with ExpectsInputTypes {
+case class ScriptMapInStrOutBool(lang: Expression,
+                                 script: Expression,
+                                 func: Expression,
+                                 column: Expression) extends  Expression with ExpectsInputTypes {
 
   @transient private lazy val nativeFunctionRunnerPointers =
   new ConcurrentHashMap[String, Long]()
@@ -55,7 +55,7 @@ case class RunScriptMapInStrOutBool(lang: Expression,
         )
       )
 
-      native.runScriptMapInStrOutBool(scriptRunnerPointer, columnValue.toString)
+      native.scriptMapInStrOutBool(scriptRunnerPointer, columnValue.toString)
     } catch {
       case e: Exception =>
         // Log error
@@ -150,7 +150,7 @@ case class RunScriptMapInStrOutBool(lang: Expression,
               $pointer = $existingPointer.longValue();
             }
 
-            ${ev.value} = $native.runScriptMapInStrOutBool(
+            ${ev.value} = $native.scriptMapInStrOutBool(
               $pointer,
               $columnStrTerm
             );
@@ -166,19 +166,19 @@ case class RunScriptMapInStrOutBool(lang: Expression,
 
 
 
-  override def prettyName: String = "run_script_map_in_str_out_bool"
+  override def prettyName: String = "script_map_in_str_out_bool"
 
   override protected def withNewChildrenInternal(newChildren: IndexedSeq[Expression]): Expression = {
-    RunScriptMapInStrOutBool(newChildren(0), newChildren(1), newChildren(2), newChildren(3))
+    ScriptMapInStrOutBool(newChildren(0), newChildren(1), newChildren(2), newChildren(3))
   }
 
   override def inputTypes: Seq[DataType] = Seq(StringType, StringType, StringType, StringType)
 }
 
 
-object RunScriptMapInStrOutBool {
+object ScriptMapInStrOutBool {
   def apply(children: Seq[Expression]): Expression = {
-    new RunScriptMapInStrOutBool(
+    new ScriptMapInStrOutBool(
       children.head,
       children.apply(1),
       children.apply(2),
