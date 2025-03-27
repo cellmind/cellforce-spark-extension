@@ -1,4 +1,4 @@
-package cellgen.spark
+package cellforce.spark
 
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.spark.sql.catalyst.expressions.codegen.Block.BlockHelper

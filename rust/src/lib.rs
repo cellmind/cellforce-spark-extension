@@ -18,8 +18,8 @@ use std::sync::Arc;
 use j4rs::InvocationArg;
 use j4rs::prelude::*;
 use j4rs_derive::*;
-use cellgen_script_core::runner::base::ScriptFunctionRunner;
-use cellgen_script_core::runner::builder::ScriptFunctionRunnerBuilder;
+use cellforce_script_core::runner::base::ScriptFunctionRunner;
+use cellforce_script_core::runner::builder::ScriptFunctionRunnerBuilder;
 use j4rs::errors::J4RsError;
 
 #[cfg(target_pointer_width = "64")]
@@ -37,7 +37,7 @@ fn j3rs_error_to_string(err: J4RsError) -> String {
     err.to_string()
 }
 
-#[call_from_java("cellgen.spark.NativeFunctions.newscriptrunner")]
+#[call_from_java("cellforce.spark.NativeFunctions.newscriptrunner")]
 fn new_script_runner(lang: Instance, script: Instance, func: Instance) -> Result<Instance, String> {
     let jvm: Jvm = Jvm::attach_thread().map_err(j3rs_error_to_string)?;
     let lang: String = jvm.to_rust(lang).map_err(j3rs_error_to_string)?;
@@ -53,7 +53,7 @@ fn new_script_runner(lang: Instance, script: Instance, func: Instance) -> Result
     Instance::try_from(ia).map_err(j3rs_error_to_string)
 }
 
-#[call_from_java("cellgen.spark.NativeFunctions.dropscriptrunner")]
+#[call_from_java("cellforce.spark.NativeFunctions.dropscriptrunner")]
 fn drop_script_runner(pointer: Instance) -> Result<Instance, String> {
     let jvm: Jvm = Jvm::attach_thread().map_err(j3rs_error_to_string)?;
     let pointer: i64 = jvm.to_rust(pointer).map_err(j3rs_error_to_string)?;
@@ -64,7 +64,7 @@ fn drop_script_runner(pointer: Instance) -> Result<Instance, String> {
     Instance::try_from(ia).map_err(j3rs_error_to_string)
 }
 
-#[call_from_java("cellgen.spark.NativeFunctions.scriptmapinstroutstr")]
+#[call_from_java("cellforce.spark.NativeFunctions.scriptmapinstroutstr")]
 fn run_script_map_in_str_out_str(pointer: Instance, value: Instance) -> Result<Instance, String> {
     let jvm: Jvm = Jvm::attach_thread().map_err(j3rs_error_to_string)?;
     let pointer: i64 = jvm.to_rust(pointer).map_err(j3rs_error_to_string)?;
@@ -77,7 +77,7 @@ fn run_script_map_in_str_out_str(pointer: Instance, value: Instance) -> Result<I
 }
 
 
-#[call_from_java("cellgen.spark.NativeFunctions.scriptmapinstroutbool")]
+#[call_from_java("cellforce.spark.NativeFunctions.scriptmapinstroutbool")]
 fn run_script_map_in_str_out_bool(pointer: Instance, value: Instance) -> Result<Instance, String> {
     let jvm: Jvm = Jvm::attach_thread().map_err(j3rs_error_to_string)?;
     let pointer: i64 = jvm.to_rust(pointer).map_err(j3rs_error_to_string)?;

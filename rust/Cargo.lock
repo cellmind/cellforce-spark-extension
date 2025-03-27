@@ -466,9 +466,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "cellgen-script-core"
+name = "cellforce-script-core"
 version = "0.1.0"
-source = "git+https://github.com/cellmind/cellgen-script-core#ef3a9054b50ce337e2c27f826ce19378207caddb"
+source = "git+https://github.com/cellmind/cellforce-script-core#5574ef602fd72b30bff3b0b3c1b964da0b348932"
 dependencies = [
  "base64",
  "boa_engine",
@@ -487,10 +487,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "cellgen-spark-extension"
+name = "cellforce-spark-extension"
 version = "0.1.0"
 dependencies = [
- "cellgen-script-core",
+ "cellforce-script-core",
  "j4rs",
  "j4rs_derive",
  "serde",

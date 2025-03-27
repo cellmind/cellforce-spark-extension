@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package cellgen.spark
+package cellforce.spark
 
 import org.apache.spark.sql.catalyst.FunctionIdentifier
 import org.apache.spark.sql.catalyst.expressions.aggregate.{ScriptReduceInIntOutInt, UserSum}

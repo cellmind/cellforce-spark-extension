@@ -1,5 +1,5 @@
 [package]
-name = "cellgen-spark-extension"
+name = "cellforce-spark-extension"
 version = "0.1.0"
 authors = []
 edition = "2018"
@@ -9,7 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 
-cellgen-script-core = { git = "https://github.com/cellmind/cellgen-script-core" }
+cellforce-script-core = { git = "https://github.com/cellmind/cellforce-script-core" }
 
 
 j4rs = "0.17"

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ai</groupId>
-    <artifactId>cellgen-spark-extension</artifactId>
+    <artifactId>cellforce-spark-extension</artifactId>
     <version>1.0.0</version>
 
     <repositories>
@@ -116,7 +116,7 @@
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
                             <mainClass>
-                                cellgen.spark.Main
+                                cellforce.spark.Main
                             </mainClass>
                         </manifest>
                     </archive>

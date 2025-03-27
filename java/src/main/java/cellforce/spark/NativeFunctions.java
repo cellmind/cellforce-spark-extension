@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package cellgen.spark;
+package cellforce.spark;
 
 import org.astonbitecode.j4rs.api.Instance;
 import org.astonbitecode.j4rs.api.java2rust.Java2RustUtils;
@@ -26,7 +26,7 @@ public class NativeFunctions {
 
 
     static {
-        System.loadLibrary("cellgen_spark_extension");
+        System.loadLibrary("cellforce_spark_extension");
     }
 
     public Long newScriptRunner(String lang, String script, String func) {
