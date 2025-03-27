@@ -468,6 +468,7 @@ dependencies = [
 [[package]]
 name = "cellgen-script-core"
 version = "0.1.0"
+source = "git+https://github.com/cellmind/cellgen-script-core#ef3a9054b50ce337e2c27f826ce19378207caddb"
 dependencies = [
  "base64",
  "boa_engine",

@@ -9,7 +9,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 
-cellgen-script-core = { path = '../../cellgen-script-core' }
+cellgen-script-core = { git = "https://github.com/cellmind/cellgen-script-core" }
 
 
 j4rs = "0.17"
